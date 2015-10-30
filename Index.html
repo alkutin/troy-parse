@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1251">  
+  <title>TroyParse</title>
+  <!--<link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" />   
+  <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.css" />-->
+  <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet" />
+  <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.css" rel="stylesheet" />  
+  </head>
+  <body>
+    <div>
+    <h1>Parse</h1>    
+    
+    <ul id="table" class="table list-unstyled">
+    </ul>
+    </div>
+    <hr />
+    <div>
+    <h1 id="sortClick" class="btn">Sorted</h1>
+    <ul id="table2" class="table list-unstyled">
+    </ul>
+    </div>
+    
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript">
+      var url = "catalog";       
+      console.log(url);
+      var responseData = null;
+      
+      var images = [];
+      var titles = [];
+      var sums = [];
+      
+      function OpTitle(title)
+      {
+        if (title.indexOf("????????") > 0)
+          return "We buy:";
+        else if (title.indexOf("???????") > 0)
+          return "We sell:";
+        else return "[" + title + "]";
+      };
+      
+      function OpValue(src)
+      {
+        return parseInt(src.replace(" ", "").replace(" ", "").replace(" ", "").replace(" ", "").replace(" ", "").replace(" ", ""));      
+      };
+      
+      $.get(url, function(data) {
+        responseData = data;
+        console.log(responseData.length);
+        
+        $(data).find("tr[class='card_product'] td div[class='img_pr']").each(function(trr) {
+          var $td = $(this);
+          var $img = $td.find("img"); 
+          images.push({title: $img.attr("title"), src: $img.attr("src")});          
+        });
+        
+        $(data).find("tr[class='card_product'] td[class='sign']").each(function(trr) {
+          var $td = $(this);
+          titles.push($td.find("a").text());          
+        });
+        
+        $(data).find("tr[class='card_product'] td").each(function(trr) {
+          var $td = $(this);
+          
+          if ($td.find("a").length > 0)
+            return;
+          
+          var $pk = $td.find("div[class='sign-m'] div[class='pokupr']");
+          var items = [];
+          $pk.each(function() {
+            var $pkThis = $(this);
+            items.push({ title: $pkThis.text(), sum: $pkThis.next().text() });
+          });
+           
+          //if (items.length > 0)
+          sums.push(items);          
+        });
+        
+        console.log(images.length, titles.length, sums.length);
+        console.log(images, titles, sums);
+        
+        for (var idx = 0; idx < titles.length; idx++)
+        {
+          $tr = $("#table").append("<li class='row'></li>");
+          $tr.append("<span class='col-md-6'>" + titles[idx] + "</span>");
+          var sum = sums[idx];
+          var sum1 = '';
+          var sum2 = '';
+          if (sum.length > 0) {
+            sum1 = OpValue(sum[0].sum);
+            $tr.append("<span class='col-md-1'>" + OpTitle(sum[0].title) + "</span>" + "<span class='col-md-1'>" + sum1 + "</span>");
+          };
+          
+          if (sum.length > 1)
+          {
+            sum2 = OpValue(sum[1].sum);
+            $tr.append("<span class='col-md-1'>" + OpTitle(sum[1].title) + "</span>" + "<span class='col-md-1'>" + sum2 + "</span>");
+            
+            if (!isNaN(sum1) && !isNaN(sum2))
+            {
+              var sum3 = 0;
+              if (sum1 > sum2)
+                sum3 = sum1 / sum2;
+              else sum3 = sum2 / sum1;
+              
+              $tr.append("<span class='col-md-1'>" + sum3 + "</span>");
+            };
+          }
+                    
+          //$tr.append("<div class='col-md-2'>" +  + "</div>");
+          //$tr.append("<div class='col-md-2'>" + "" + "</div>");
+        };
+        
+        $("#sortClick").click(function() {
+         var sorted = $("#table").find("li").sort(function(a,b) {
+          $as = $(a).find("span");
+          $bs = $(b).find("span");
+          
+          if ($as.length > 5 && $bs.length > 5)
+          {
+            return $as[5] > $bs[5] ? 1 : -1;
+          } else if ($as.length > 5) {
+            return 1;
+          } else if ($bs.length > 5) {
+            return -1;
+          }
+          else {
+            return $as.text() > $bs.text() ? 1 : -1;
+          };
+         });
+         
+         console.log(sorted);
+         $("#table2").append(sorted);
+         $("#table").html("");
+         });
+      });
+    </script>
+  </body>
+</html>
