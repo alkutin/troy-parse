@@ -7,8 +7,13 @@
   <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.css" />-->
   <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet" />
   <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap-theme.css" rel="stylesheet" />  
+  <style type="text/css">
+      li:nth-child(even) {background: #CCC; text-decoration: dotted;}
+      li:nth-child(odd) {background: #FFF}
+  </style>
+
   </head>
-  <body>
+  <body>    
     <div>
     <h1>Parse</h1>    
     
@@ -19,6 +24,10 @@
     <div>
     <h1 id="sortClick" class="btn">Sorted</h1>
     <ul id="table2" class="table list-unstyled">
+        <li>item 1</li>
+        <li>item 2</li>
+        <li>item 3</li>
+        <li>item 4</li>
     </ul>
     </div>
     
@@ -84,20 +93,21 @@
         
         for (var idx = 0; idx < titles.length; idx++)
         {
-          $tr = $("#table").append("<li class='row'></li>");
-          $tr.append("<span class='col-md-6'>" + titles[idx] + "</span>");
+            var line = "<li class='row'>";
+            
+            line += "<span class='col-md-6'>" + titles[idx] + "</span>";
           var sum = sums[idx];
           var sum1 = '';
           var sum2 = '';
           if (sum.length > 0) {
             sum1 = OpValue(sum[0].sum);
-            $tr.append("<span class='col-md-1'>" + OpTitle(sum[0].title) + "</span>" + "<span class='col-md-1'>" + sum1 + "</span>");
+            line += "<span class='col-md-1'>" + OpTitle(sum[0].title) + "</span>" + "<span class='col-md-1'>" + sum1 + "</span>";
           };
           
           if (sum.length > 1)
           {
             sum2 = OpValue(sum[1].sum);
-            $tr.append("<span class='col-md-1'>" + OpTitle(sum[1].title) + "</span>" + "<span class='col-md-1'>" + sum2 + "</span>");
+            line += "<span class='col-md-1'>" + OpTitle(sum[1].title) + "</span>" + "<span class='col-md-1'>" + sum2 + "</span>";
             
             if (!isNaN(sum1) && !isNaN(sum2))
             {
@@ -106,12 +116,13 @@
                 sum3 = sum1 / sum2;
               else sum3 = sum2 / sum1;
               
-              $tr.append("<span class='col-md-1'>" + sum3 + "</span>");
+              line += "<span class='col-md-1'>" + sum3 + "</span>";
             };
           }
                     
           //$tr.append("<div class='col-md-2'>" +  + "</div>");
-          //$tr.append("<div class='col-md-2'>" + "" + "</div>");
+            //$tr.append("<div class='col-md-2'>" + "" + "</div>");
+          var $tr = $("#table").append(line + "</li>");
         };
         
         $("#sortClick").click(function() {
